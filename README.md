@@ -1,0 +1,1 @@
+# git-hook-ticket-number

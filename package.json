@@ -1,0 +1,12 @@
+{
+  "name": "git-hook-ticket-number",
+  "module": "main.ts",
+  "type": "module",
+  "scripts": {
+    "compile": "bun build --compile --outfile git-htn main.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.0.0"
+  }
+}
