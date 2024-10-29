@@ -44,17 +44,27 @@ switch (command) {
   case undefined:
     break;
   case "install":
-    break;
-  case "config":
+    const hooksDirCmd = await $`git rev-parse --git-path hooks`.quiet().nothrow();
+    if (hooksDirCmd.exitCode) {
+      console.warn(hooksDirCmd.stderr.toString().trimEnd());
+      exit(hooksDirCmd.exitCode);
+    }
+    const hooksDir = hooksDirCmd.text().trimEnd();
+    console.info(`Installing to ${hooksDir}...`);
+    await $`cp ${Bun.which("git-htn")} ${hooksDir}/commit-msg`;
     break;
   default:
+    const message = (await Bun.file(command).text()).split("\n");
+    if (!message) exit(1);
+    const line = message.at(0);
+    if (!line) exit(1);
     const branchName = await getBranchName();
     if (!branchName) exit(0);
     const ticketNumber = getTicketNumber(branchName);
     if (!ticketNumber) exit(0);
-    const message = (await Bun.file(command).text()).split("\n").at(0);
-    if (!message) exit(1);
-    const edited = apply(ticketNumber, message, "after_colon", "square");
-    await Bun.write(command, edited);
+    if (line.toUpperCase().includes(ticketNumber)) exit(0);
+    const edited = apply(ticketNumber, line, "after_colon", "square");
+    const editedMessage = [edited, ...message.slice(1)].join("\n");
+    await Bun.write(command, editedMessage);
     exit(0);
 }
