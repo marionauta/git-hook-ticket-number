@@ -92,6 +92,7 @@ const argv = Bun.argv.slice(2); // skip bun & program name
 const command = argv.shift();
 switch (command) {
   case undefined:
+    console.log(Bun.which("git-htn"));
     break;
   case "install":
     const hooksDirCmd = await $`git rev-parse --git-path hooks`
